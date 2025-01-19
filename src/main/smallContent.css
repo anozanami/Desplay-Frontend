@@ -1,0 +1,23 @@
+.photo-gallery {
+    display: flex;
+    justify-content: space-around; /* 간격을 균등하게 분배 */
+    padding: 20px;
+  }
+  
+  .photo-item {
+    text-align: center;
+    width: 100px; /* 적절한 너비를 설정하세요 */
+  }
+  
+  .photo-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    color: aliceblue;
+  }
+  
+  .photo-item p {
+    margin-top: 8px;
+    font-size: 14px;
+  }
+  
