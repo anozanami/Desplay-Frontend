@@ -37,17 +37,17 @@ class SmallContent extends Component {
   fetchImages = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await axios.get('http://43.201.215.174/api/image/show/101', {
+      const response = await axios.get('http://43.201.215.174/api/image/show', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
-        // params: {
-        //   imageId: 101
-        // }
+        params: {
+          imageId: 101
+        }
       });
 
       if (response.status === 200) {
-        const photos = response.data.slice(0, 7); // 무작위의 7개의 이미지를 가져옵니다.
+        const photos = response.data.slice(0, 7);
         this.setState({ photos });
       } else {
         console.error('이미지를 불러오는 중 오류가 발생했습니다.');
@@ -73,7 +73,7 @@ class SmallContent extends Component {
   
       if (response.ok) {
         const data = await response.json();
-        const photos = data.slice(0, 7); // 무작위의 7개의 이미지를 가져옵니다.
+        const photos = data.slice(0, 7);
         this.setState({ photos });
       } else {
         console.error('이미지를 불러오는 중 오류가 발생했습니다.');

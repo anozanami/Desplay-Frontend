@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './App.css';
-
+import { Transition } from 'react-transition-group'; 
 import Header from './header';
 import BigContent from './main/bigContent';
 import SmallContent from './main/smallContent';
