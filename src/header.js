@@ -4,11 +4,6 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './header.css';
 
-console.log(sessionStorage.getItem('loggedIn'));
-console.log(sessionStorage.getItem('userId'));
-console.log(localStorage.getItem('accessToken'));
-
-
 class Header extends Component {
   constructor(props) {
     super(props);
@@ -39,14 +34,18 @@ class Header extends Component {
 
     if (searchQuery.length > 0) {
       try {
-        const response = await axios.get('http://43.201.215.174/api/auto-complete/get-string', {
-          params: { 
-            query: searchQuery
-           }
+        const token = localStorage.getItem('accessToken');
+        const response = await axios({
+          method: 'GET',
+          url: `http://43.201.215.174/api/auto-complete/get-string/${searchQuery}`,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
         });
-
         if (response.status === 200) {
-          this.setState({ autoCompleteSuggestions: response.data });
+          console.log('자동완성 응답 데이터:', response.data.list);
+          this.setState({ autoCompleteSuggestions: response.data.list.slice(0, 6) });
         } else {
           console.error('자동완성 오류');
         }
@@ -59,11 +58,17 @@ class Header extends Component {
   };
 
   handleAutoCompleteSelect = async (suggestion) => {
+    const token = localStorage.getItem('accessToken');
     this.setState({ searchQuery: suggestion, autoCompleteSuggestions: [] });
 
     try {
       await axios.post('http://43.201.215.174/api/auto-complete/update-string', {
-        query: suggestion
+        json: {
+          input: suggestion
+        },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
       });
     } catch (error) {
       console.error('자동완성 문자열을 업데이트하는 중 오류가 발생했습니다.', error);
@@ -71,23 +76,33 @@ class Header extends Component {
   };
 
   handleSearch = async () => {
+    const token = localStorage.getItem('accessToken');
     const { searchQuery } = this.state;
     try {
       const response = await axios.get('http://43.201.215.174/api/board/search', {
         params: {
           page: 0,
-          size: 3, 
-          keyword: searchQuery,
-          // moodTypes: 'NEAT&FANCY',
-          username: this.state.userId, 
+          size: 100,
+          keyword: searchQuery, // 고정
+          // tags: 'NEAT&FANCY',
+          // username: this.state.userId, 마이페이지에서만 필요
           // sortType: 'DATE_DESC&LIKE_ASC', 
-          // searchType: 'MAIN'
+          searchType: 'MAIN' // 고정
+        },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
       if (response.status === 200) {
-        this.setState({ searchResults: response.data });
-        console.log("response.data = " + response.data);
+        for (let i = 0; i < response.data.content.length; i++) {
+          for (let j = 0; j < response.data.content[i].images.length; j++) {
+          console.log("response = " + response.data.content[i].images[j].imageId);
+          }
+        }
+        console.log("response = " + response.data.content);
+        // this.setState({ searchResults: response.data.content.boardId });
       } else {
         console.error('검색 중 오류가 발생했습니다.');
       }
@@ -115,7 +130,8 @@ class Header extends Component {
             className="form-control w-50 h-50"
             value={this.state.searchQuery}
             onChange={this.handleInputChange}
-          />
+          /> 
+                    
           <button className="btn btn-primary mx-1" onClick={this.handleSearch}>검색</button>
           {autoCompleteSuggestions.length > 0 && (
             <ul className="list-group">

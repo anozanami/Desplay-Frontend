@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './smallContent.css';
@@ -9,30 +9,9 @@ class SmallContent extends Component {
   };
 
   componentDidMount() {
-    this.fetchImages();
-    // this.test();
-    // this.test2();
+    // this.fetchImages();
     // this.fetchImages2();
   }
-
-  test = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.postForm('http://43.201.215.174/test/member/user', {
-        json: {
-
-        }
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
-      console.log(response);
-    } catch (error) {
-      console.error('이미지를 불러오는 중 오류가 발생했습니다.', error);
-    }
-  };
 
   fetchImages = async () => {
     try {
@@ -60,24 +39,27 @@ class SmallContent extends Component {
   fetchImages2 = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://43.201.215.174/api/image/show?imageId=1', {
+      const response = await axios({
         method: 'GET',
+        url: 'http://43.201.215.174/api/image/show/1',
+        responseType: 'blob',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        json: {
-          imageId: 1
-        }
+        // params: {
+        //   imageId: 101
+        // }
+      }).then(response => {
+        // let urll = window.URL || window.webkitURL;
+        const url = window.URL.createObjectURL(new Blob([response.data], {
+          type: response.headers['content-type']
+        }));
+        this.setState({ photos: [{ src: url }] });
+        useCallback(url);
+      }).catch(error => {
+        console.error('이미지를 불러오는 중 오류가 발생했습니다.', error);
       });
-  
-      if (response.ok) {
-        const data = await response.json();
-        const photos = data.slice(0, 7);
-        this.setState({ photos });
-      } else {
-        console.error('이미지를 불러오는 중 오류가 발생했습니다.');
-      }
     } catch (error) {
       console.error('이미지를 불러오는 중 오류가 발생했습니다.', error);
     }

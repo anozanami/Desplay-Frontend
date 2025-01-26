@@ -1,10 +1,20 @@
 import React, { Component } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { TransitionGroup, CSSTransition, Transition } from "react-transition-group";
+
 export const auth = axios.create({
   baseURL: process.env.REACT_APP_API_URL
 });
+
+const animationTiming = {
+  enter: 400,
+  exit: 500,
+};
+
+
+
 
 class Login extends Component {
   constructor(props) {
@@ -15,7 +25,7 @@ class Login extends Component {
       loggedIn: false,
       error: '',
     };
-  }    
+  }
 
   handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -38,46 +48,50 @@ class Login extends Component {
       });
 
       if (response.status === 200) {
-          sessionStorage.setItem('loggedIn', 'true');
-          sessionStorage.setItem('userId', username);
-          localStorage.setItem('accessToken', response.data.accessToken);
-          localStorage.setItem('refreshToken', response.data.refreshToken);
-        // if(response.data.accessToken === localStorage.getItem('accessToken')){
-        //   sessionStorage.setItem('loggedIn', 'true');
-        //   sessionStorage.setItem('userId', username);
-
-        //   localStorage.setItem('accessToken', response.data.accessToken);
-        //   localStorage.setItem('refreshToken', response.data.refreshToken);
-        // } else if(response.data.refreshToken === localStorage.getItem('refreshToken')){
-        //   localStorage.removeItem('accessToken', response.data.accessToken);
-        //   localStorage.setItem('accessToken', response.data.accessToken);
-
-        //   sessionStorage.setItem('loggedIn', 'true');
-        //   sessionStorage.setItem('userId', username);
-        // } else if(response.data.error === "INVALID_TOKEN"){
-        //   localStorage.removeItem('accessToken');
-        //   localStorage.removeItem('refreshToken');
-        //   alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
-        // }
+        sessionStorage.setItem('loggedIn', 'true');
+        sessionStorage.setItem('userId', username);
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
         this.setState({ loggedIn: true, error: '' });
         this.props.onLogin(username, response.data.accessToken, response.data.refreshToken);
       } else {
         this.setState({ error: response.data.message });
       }
     } catch (error) {
-      if (error.response) {
-        this.setState({ error: error.response.data.message });
-      } else {
-        this.setState({ error: '로그인 중 오류가 발생했습니다.' });
-      }
+      this.setState({ error: '비밀번호가 틀렸습니다.' });
+      // if (error.response) {
+      //   this.setState({ error: error.response });
+      // } else {
+      //   this.setState({ error: '로그인 중 오류가 발생했습니다.' });
+      // }
     }
   };
 
   render() {
     if (this.state.loggedIn || sessionStorage.getItem('loggedIn') === 'true') {
-      return <Navigate to="/" />;
-    }   
-    
+      return (
+        // <Transition in={this.state.registered} timeout={animationTiming} mountOnEnter unmountOnExit>
+        //   {state => (
+        //     <div style={{
+        //       transition: `opacity ${animationTiming.enter}ms`,
+        //       opacity: state === 'entering' || state === 'entered' ? 1 : 0
+        //     }}>
+        //       <Navigate to="/" />
+        //     </div>
+        //   )}
+        // </Transition>
+        <TransitionGroup>
+          <CSSTransition
+            // key={location.pathname}
+            timeout={500}
+            className="page-transition"
+          >
+            <Navigate to="/" />
+          </CSSTransition>
+        </TransitionGroup>
+      )
+    }
+
     return (
       <div className="container mt-5 d-flex justify-content-center">
         <div className="w-100" style={{ maxWidth: '400px' }}>
