@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom'; // useNavigate를 Navigate로 수�
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { Transition } from 'react-transition-group';
+import { config } from '../config';
 
 const animationTiming = {
   enter: 400,
@@ -35,7 +36,7 @@ class Register extends Component {
     const { username, password, email } = this.state;
 
     try {
-      const response = await axios.post('http://43.201.215.174/api/member/sign-up', {
+      const response = await axios.post(config.api+'/api/member/sign-up', {
         username: username, 
         password: password, 
         email: email 
@@ -66,7 +67,7 @@ class Register extends Component {
     event.preventDefault();
     const { email } = this.state;
     try {
-      const response = await axios.post('http://43.201.215.174/api/mail/auth-send', {
+      const response = await axios.post(config.api+'/api/mail/auth-send', {
         receiverMail: email 
       }, {
         headers: {
@@ -92,7 +93,7 @@ class Register extends Component {
     const { email, verificationCode } = this.state;
 
     try {
-      const response = await axios.post('http://43.201.215.174/api/mail/auth-check', {
+      const response = await axios.post(config.api+'/api/mail/auth-check', {
         receiverMail: email, 
         authNumber: verificationCode 
       }, {

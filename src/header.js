@@ -1,8 +1,13 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, { Component, useState } from 'react';
+import { Navigate, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './header.css';
+import BigContent from './main/bigContent';
+import SmallContent from './main/smallContent';
+
+const serverIpAddress = "http://221.139.98.118";
+let BoardId = null;
 
 class Header extends Component {
   constructor(props) {
@@ -13,7 +18,9 @@ class Header extends Component {
       searchQuery: '',
       searchResults: [],
       autoCompleteSuggestions: [],
-      accessToken: sessionStorage.getItem('accessToken')
+      accessToken: sessionStorage.getItem('accessToken'),
+      selectedBoardId: null,
+      boardId: null
     };
   }
 
@@ -37,20 +44,21 @@ class Header extends Component {
         const token = localStorage.getItem('accessToken');
         const response = await axios({
           method: 'GET',
-          url: `http://43.201.215.174/api/auto-complete/get-string/${searchQuery}`,
+          url: `${serverIpAddress}/api/auto-complete/get-string/${searchQuery}`,
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           }
         });
+        console.log('searchQuery : ', searchQuery);
         if (response.status === 200) {
           console.log('자동완성 응답 데이터:', response.data.list);
           this.setState({ autoCompleteSuggestions: response.data.list.slice(0, 6) });
         } else {
-          console.error('자동완성 오류');
+          console.error('자동완성 오류1');
         }
       } catch (error) {
-        console.error('자동완성 오류', error);
+        console.error('자동완성 오류2', error);
       }
     } else {
       this.setState({ autoCompleteSuggestions: [] });
@@ -62,7 +70,7 @@ class Header extends Component {
     this.setState({ searchQuery: suggestion, autoCompleteSuggestions: [] });
 
     try {
-      await axios.post('http://43.201.215.174/api/auto-complete/update-string', {
+      await axios.post(serverIpAddress + '/api/auto-complete/update-string', {
         json: {
           input: suggestion
         },
@@ -79,7 +87,7 @@ class Header extends Component {
     const token = localStorage.getItem('accessToken');
     const { searchQuery } = this.state;
     try {
-      const response = await axios.get('http://43.201.215.174/api/board/search', {
+      const response = await axios.get(serverIpAddress + '/api/board/search', {
         params: {
           page: 0,
           size: 100,
@@ -96,13 +104,20 @@ class Header extends Component {
       });
 
       if (response.status === 200) {
+        const boardId = [];
         for (let i = 0; i < response.data.content.length; i++) {
-          for (let j = 0; j < response.data.content[i].images.length; j++) {
-          console.log("response = " + response.data.content[i].images[j].imageId);
-          }
+          boardId.push(response.data.content[i].boardId);
         }
-        console.log("response = " + response.data.content);
-        // this.setState({ searchResults: response.data.content.boardId });
+        this.setState({ selectedBoardId: boardId, searchResults: response.data.content });
+        BoardId = boardId;
+        console.log('검색 결과:', boardId);
+        console.log('selectedBoardId : ', this.state.selectedBoardId);
+        console.log('BoardId : ', BoardId);
+        // URL을 검색 쿼리와 함께 변경
+        sessionStorage.setItem('boardId', boardId);
+        const navigate = this.props.navigate;
+        navigate(`/?query=${searchQuery}`);
+
       } else {
         console.error('검색 중 오류가 발생했습니다.');
       }
@@ -111,28 +126,34 @@ class Header extends Component {
     }
   };
 
+  handleHomeClick = () => {
+    window.location.href = '/';
+  };
+
   render() {
     const loggedIn = sessionStorage.getItem('loggedIn') === 'true';
     const userId = sessionStorage.getItem('userId');
-    const { searchQuery, autoCompleteSuggestions } = this.state;
-    console.log();
+    const { searchQuery, autoCompleteSuggestions, selectedBoardId } = this.state;
     return (
       <header className="d-flex justify-content-between align-items-center p-3 bg-light shadow-sm">
-        <div className="">
-          <Link to="/">
-            <button className="btn btn-primary mx-1">Desplay</button>
-          </Link>
+        <div className="left-section">
+          <button className="btn btn-primary mx-1" onClick={this.handleHomeClick}>Desplay</button>
         </div>
-        <div className="flex-grow-1 text-center d-flex justify-content-center">
+
+        {/* 검색창 */}
+        <div className="search-section flex-grow-1 text-center d-flex justify-content-center">
           <input
             type="text"
-            placeholder="검색어를 입력"
+            placeholder="검색어를 입력하세요"
             className="form-control w-50 h-50"
             value={this.state.searchQuery}
             onChange={this.handleInputChange}
-          /> 
-                    
-          <button className="btn btn-primary mx-1" onClick={this.handleSearch}>검색</button>
+          />
+          <button 
+            className="btn btn-primary mx-1" 
+            onClick={this.handleSearch}
+          >검색</button>
+
           {autoCompleteSuggestions.length > 0 && (
             <ul className="list-group">
               {autoCompleteSuggestions.map((suggestion, index) => (
@@ -146,11 +167,14 @@ class Header extends Component {
               ))}
             </ul>
           )}
+          
         </div>
-        <div>
+        {/* 검색창 */}
+
+        <div className="right-section">
           {loggedIn ? (
             <div>
-              <span className="mx-2">환영합니다, {userId}</span>
+              <span className="mx-2">환영합니다, {userId}님</span>
               <Link to={`/post`} userId={userId}>
                 <button className="btn btn-primary mx-1">글쓰기</button>
               </Link>
@@ -170,7 +194,7 @@ class Header extends Component {
             </div>
           )}
         </div>
-        <div className="search-results">
+        {/* <div className="search-results">
           {this.state.searchResults.map((result, index) => (
             <div key={index} className="search-result-item">
               <Link to={`/board/${result.id}`}>
@@ -179,10 +203,17 @@ class Header extends Component {
               </Link>
             </div>
           ))}
-        </div>
+        </div> */}
+        
       </header>
     );
   }
 }
 
-export default Header;
+// Header 컴포넌트를 함수형 컴포넌트로 감싸서 navigate를 props로 전달
+const HeaderWithNavigate = (props) => {
+  const navigate = useNavigate();
+  return <Header {...props} navigate={navigate} />;
+};
+
+export default HeaderWithNavigate;

@@ -1,27 +1,39 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import axios, { formToJSON } from 'axios';
+import axios from 'axios';
 import './post.css';
+import { config } from '../config.js';
 
 class Post extends Component {
-  state = {
-    selectedImage: null,
-    title: '',
-    content: '',
-    tags: [],
-    items: [('name', 'link')],
-    currentItem: {
-      name: '',
-      link: ''
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedImage: null,
+      title: '',
+      content: '',
+      tags: [],
+      items: [],
+      currentItem: {
+        name: '',
+        link: ''
+      },
+      currentFile : null,
+      images: []
     }
-  };
+  }
 
   onFileChange = (event) => {
     const file = event.target.files[0];
+    console.log('파일:', file);
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.setState({ selectedImage: e.target.result });
+        const newImage = e.target.result;
+        this.setState((prevState) => ({
+          selectedImage: newImage,
+          // images: [...prevState.images, file]
+          currentFile: file
+        }));
       };
       reader.readAsDataURL(file);
     }
@@ -47,63 +59,75 @@ class Post extends Component {
     this.setState({ currentItem: { ...this.state.currentItem, link: event.target.value } });
   };
 
-  addItem = () => {
+  addItem = (event) => {
+    
     this.setState((prevState) => ({
-      items: [...prevState.currentItem.name, prevState.currentItem.link],
-      currentItem: { name: '', link: '' }
+      items: [...prevState.items, { first: prevState.currentItem.name, second: prevState.currentItem.link }],
+      images: [...prevState.images, prevState.currentFile],
+      currentItem: { name: '', link: '' },
+      selectedImage: null
     }));
-    console.log(this.state.items);
   };
 
-  onSubmit = async () => {
-    const { selectedImage, title, content, tags, items } = this.state
+  onSubmit = async (e) => {
+    // e.preventDefault();
+    const { images, title, content, tags, items } = this.state
+    console.log('이미지 리스트:', images);
     const formData = new FormData();
 
     const data = {
       title: title,
       content: content,
       tags: tags,
-      items: items.map(item => ({
-        first: 'name',
-        second: 'link',
-      }))
+      items: items
     };
 
-    // console.log('게시글 작성 데이터:', data); 
-    // console.log('제이슨 데이터:', JSON.stringify(data));
-    // console.log('이미지 데이터:', selectedImage);
-    formData.append('boardWriteRequest', JSON.stringify(data));
-    formData.append('files', selectedImage);
+    console.log('게시글 작성 데이터:', data);
 
-    console.log('폼 데이터:', formData);  
+    formData.append('boardWriteRequest', new Blob([JSON.stringify(data)], {
+      type: "application/json"
+    }));
 
-    
+    images.forEach((image) => {
+      formData.append("files", image);
+    });
+
     try {
-      const response = await axios.post('http://43.201.215.174/api/board/write', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
+      const response = await axios.post(`${config.api}/api/board/write`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
 
-      if (response.status === 200) {
-        console.log('게시글 작성 성공:', response.data);
-      } else {
-        console.error('게시글 작성 중 오류가 발생했습니다.');
-      }
+      console.log('게시글 작성 응답:', response.data);
+      alert('게시글이 작성되었습니다.');
+      this.setState({
+        selectedImage: null,
+        title: '',
+        content: '',
+        tags: [],
+        items: [],
+        currentItem: {
+          name: '',
+          link: ''
+        },
+        images: []
+      });
     } catch (error) {
       console.error('게시글 작성 중 오류가 발생했습니다.', error);
+      alert('게시글 작성 중 오류가 발생했습니다.');
     }
   };
 
 
-
   render() {
-    const { selectedImage, title, content, tags, items, currentItem } = this.state;
-
+    const { selectedImage, title, content, tags, items, currentItem, images } = this.state;
     return (
-
-      <div className="">
+      <div className="post">
+        {/* header */}
         <header className="d-flex justify-content-between align-items-center p-3 bg-light shadow-sm">
           <div className=''>
             <Link to='/'>
@@ -118,20 +142,24 @@ class Post extends Component {
             </Link>
           </div>
         </header>
+        {/* header */}
+
+        {/* form container */}
         <div className="container mt-5">
           <div className="d-flex justify-content-center">
             <div className="upload-section border p-5 text-center mx-2" style={{ width: '1000px', height: '500px' }}>
               <form style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <div style={{ flex: 1, textAlign: 'center' }}>
-                  <input
+                  {!selectedImage && <input
                     type="file"
                     accept="image/png, image/jpeg, image/jpg"
                     onChange={this.onFileChange}
                     style={{ display: 'block', margin: '0 auto' }}
-                  />
+                  />}
                   {selectedImage && (
-                    <img src={selectedImage} alt="Selected" style={{ maxWidth: '100%', maxHeight: '100%', marginTop: '10px' }} />
+                    <img src={selectedImage} alt="Selected" style={{ maxWidth: '80%', maxHeight: '80%', marginTop: '10px' }} />
                   )}
+
                 </div>
                 <div style={{ flex: 1, marginLeft: '20px' }}>
                   <input
@@ -154,29 +182,33 @@ class Post extends Component {
                     onChange={this.onTagChange}
                     style={{ width: '100%', marginTop: '10px' }}
                   />
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="상품 이름을 입력하세요 "
-                      value={currentItem.name}
-                      onChange={this.onNameChange}
-                      style={{ width: '100%', marginTop: '10px' }}
-                    />
-                    <input
-                      type='link'
-                      placeholder='상품 링크를 입력하세요'
-                      value={currentItem.link}
-                      onChange={this.onLinkChange}
-                      style={{ width: '100%', marginTop: '10px' }}
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    placeholder="상품 이름을 입력하세요"
+                    value={currentItem.name}
+                    onChange={this.onNameChange}
+                    style={{ width: '100%', marginTop: '10px' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="상품 링크를 입력하세요"
+                    value={currentItem.link}
+                    onChange={this.onLinkChange}
+                    style={{ width: '100%', marginTop: '10px' }}
+                  />
+                  <button type="button" onClick={this.addItem} className="btn btn-secondary mt-3">상품 추가</button>
+                  <button type="button" onClick={this.onSubmit} className="btn btn-primary mt-3">게시글 작성</button>
                 </div>
               </form>
-              <button type="button" onClick={this.addItem} className="btn btn-secondary mt-3">상품 추가</button>
-              <button type="button" onClick={this.onSubmit} className="btn btn-primary mt-3">게시글 작성</button>
             </div>
           </div>
+          <div className="image-preview">
+            {images.map((image, index) => (
+              <img key={index} src={URL.createObjectURL(image)} alt={`Preview ${index}`} style={{ maxWidth: '100px', maxHeight: '100px', margin: '5px' }} />
+            ))}
+          </div>
         </div>
+        {/* form container */}
       </div>
     );
   }

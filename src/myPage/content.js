@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'; // 부트스트랩 CSS 파일을 
 const posts = [
     { id: 1, content: '첫 번째 글 내용입니다.', image: 'image1.jpg' },
     { id: 2, content: '두 번째 글 내용입니다.', image: 'image2.jpg' },
-    // 필요한 만큼 포스트를 추가합니다.
 ];
 
 const imageUrl = 'https://s3-alpha-sig.figma.com/img/795f/8508/0bdddcfda6d947d68b217e8a97120729?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=md1E~PIYtZ~3gomvaEBYTfQgPknZPkaEAKpdBtiEBd2YFVoAXMWu6War-Z0S~lBJFGsN6ZQf5oczjcYFa9e~e~a~md4HfE5Jz9HQBSsUfNB4wrodsJW~b0UkvGu3u73y-8--HzVYcAQLh9TKA4obXDD8Whea~dtn5KGzRqfyC7Xx0nIKjI5cyeHdsmKg6ji7JSHw~ZOJ954IUtpU7z4wyj9dscB5NeuheiNtZBdSXUDybI4EajiPYEnzk5GoyJqI-7T4BWMgSHYEhhVowvxV3ZUKHPZCPdGISxa-Klp-r7q1CRFq~tVytQbJIh2RuZn4aPEWZ~qSfTOSybOgYsOd7w__';
@@ -20,6 +19,9 @@ class content extends Component {
                     <div className="col-md-3">
                         <div className="p-3 bg-light border rounded">
                             <h4>{userId}</h4>
+                            <nav className="nav flex-column">
+                                <a className="nav-link" href={`/mypage/${userId}`}>내가 쓴 글</a>
+                            </nav>
                             <nav className="nav flex-column">
                                 <a className="nav-link" href={`/mypage/${userId}`}>내가 쓴 글</a>
                             </nav>

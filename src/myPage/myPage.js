@@ -3,6 +3,7 @@ import Content from './content.js';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {config} from '../config.js';
 
 class myPage extends Component {
     state = {
@@ -16,7 +17,7 @@ class myPage extends Component {
 
     fetchUserImages = async () => {
         try {
-            const response = await axios.get(`http://43.201.215.174/api/image/show`, {
+            const response = await axios.get(`${config.api}/api/image/show`, {
                 json: { 
                     userId: this.state.userId
                 }
@@ -37,6 +38,7 @@ class myPage extends Component {
 
         return (
             <div className="myPage">
+                {/* header */}
                 <header className="d-flex justify-content-between align-items-center p-3 bg-light shadow-sm">
                     <div className=''>
                         <Link to='/'>
@@ -52,6 +54,8 @@ class myPage extends Component {
                         </Link>
                     </div>
                 </header>
+                {/* header */}
+
                 <Content />
                 <div className="image-gallery">
                     {images.map((image, index) => (

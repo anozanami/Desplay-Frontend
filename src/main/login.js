@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { TransitionGroup, CSSTransition, Transition } from "react-transition-group";
+import { config } from '../config';
 
 export const auth = axios.create({
   baseURL: process.env.REACT_APP_API_URL
@@ -12,9 +13,6 @@ const animationTiming = {
   enter: 400,
   exit: 500,
 };
-
-
-
 
 class Login extends Component {
   constructor(props) {
@@ -38,7 +36,7 @@ class Login extends Component {
     const { username, password } = this.state;
 
     try {
-      const response = await axios.post('http://43.201.215.174/api/member/sign-in', {
+      const response = await axios.post(config.api+'/api/member/sign-in', {
         username: username,
         password: password
       }, {
@@ -52,6 +50,7 @@ class Login extends Component {
         sessionStorage.setItem('userId', username);
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
+        localStorage.setItem('username', username);
         this.setState({ loggedIn: true, error: '' });
         this.props.onLogin(username, response.data.accessToken, response.data.refreshToken);
       } else {
