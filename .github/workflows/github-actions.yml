@@ -10,23 +10,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # 도커 이미지에 env 파일 포함
-      - name: Create .env file
-        run: |
-          touch .env
-          echo REACT_APP_KAKAO_REST_API_KEY=${{ secrets.REACT_APP_KAKAO_REST_API_KEY }}\ >> .env
-
-      # 도커 메타
-      - name: Docker meta
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
-        with:
-          images: sanbonai06/bankids-client
-          tag-semver: |
-            {{version}}
-            {{major}}.{{minor}}
-
-      
       # 내 도커허브 로그인
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -34,11 +17,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-      # 도커 빌드 관련 셋업업
+      # 도커 빌드 관련 셋업
       - name: Set up Docker Buildx
-        run: docker build -t desplay-frontend:latest . 
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/desplay-frontend:latesEt . 
 
       # 도커이미지 빌드하고 허브로푸쉬
       - name: Build and push
-        run: docker push desplay-frontend:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/desplay-frontend:latest
         
