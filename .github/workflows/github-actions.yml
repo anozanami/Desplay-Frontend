@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
+             
       # 내 도커허브 로그인
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -19,7 +19,7 @@ jobs:
           
       # 도커 빌드 관련 셋업
       - name: Set up Docker Buildx
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/desplay-frontend:latesEt . 
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/desplay-frontend:latest . 
 
       # 도커이미지 빌드하고 허브로푸쉬
       - name: Build and push
