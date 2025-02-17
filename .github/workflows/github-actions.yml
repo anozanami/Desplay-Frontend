@@ -34,7 +34,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-      # 도커 빌드 관련 셋업
+      # 도커 빌드 관련 셋업업
       - name: Set up Docker Buildx
         run: docker build -t desplay-frontend:latest . 
 
