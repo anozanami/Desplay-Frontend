@@ -2,8 +2,7 @@ import React, { Component, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './smallContent.css';
-
-const serverIpAddress = 'http://221.139.98.118';
+import { config } from '../config.js';
 
 class SmallContent extends Component {
   state = {
@@ -22,7 +21,7 @@ class SmallContent extends Component {
       const token = localStorage.getItem('accessToken');
       const response = await axios({
         method: 'GET',
-        url: `${serverIpAddress}/api/image/show`,
+        url: `${config.api}/api/image/show`,
         responseType: 'blob',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -14,10 +14,10 @@ class Post extends Component {
       tags: [],
       items: [],
       currentItem: {
-        name: '',
-        link: ''
+        first: '',
+        second: ''
       },
-      currentFile : null,
+      currentFile: null,
       images: []
     }
   }
@@ -31,7 +31,6 @@ class Post extends Component {
         const newImage = e.target.result;
         this.setState((prevState) => ({
           selectedImage: newImage,
-          // images: [...prevState.images, file]
           currentFile: file
         }));
       };
@@ -52,25 +51,30 @@ class Post extends Component {
   };
 
   onNameChange = (event) => {
-    this.setState({ currentItem: { ...this.state.currentItem, name: event.target.value } });
+    this.setState({ currentItem: { ...this.state.currentItem, first: event.target.value } });
+    // first = name
   };
 
   onLinkChange = (event) => {
-    this.setState({ currentItem: { ...this.state.currentItem, link: event.target.value } });
+    this.setState({ currentItem: { ...this.state.currentItem, second: event.target.value } });
+    // second = link
   };
 
-  addItem = (event) => {
-    
+  addImage = (event) => {
     this.setState((prevState) => ({
-      items: [...prevState.items, { first: prevState.currentItem.name, second: prevState.currentItem.link }],
       images: [...prevState.images, prevState.currentFile],
-      currentItem: { name: '', link: '' },
       selectedImage: null
     }));
   };
 
+  addItem = (event) => {
+    this.setState((prevState) => ({
+      items: [...prevState.items, { first: prevState.currentItem.first, second: prevState.currentItem.second }],
+      currentItem: { first: ' ', second: ' ' },
+    }));
+  };
+
   onSubmit = async (e) => {
-    // e.preventDefault();
     const { images, title, content, tags, items } = this.state
     console.log('이미지 리스트:', images);
     const formData = new FormData();
@@ -80,9 +84,7 @@ class Post extends Component {
       content: content,
       tags: tags,
       items: items
-    };
-
-    console.log('게시글 작성 데이터:', data);
+    };    
 
     formData.append('boardWriteRequest', new Blob([JSON.stringify(data)], {
       type: "application/json"
@@ -91,6 +93,16 @@ class Post extends Component {
     images.forEach((image) => {
       formData.append("files", image);
     });
+
+    console.log('data: ', data);
+
+    for (let key of formData.keys()) {
+      console.log('key:', key);
+    }
+
+    for (let value of formData.values()) {
+      console.log('value:', value);
+    }
 
     try {
       const response = await axios.post(`${config.api}/api/board/write`,
@@ -111,8 +123,8 @@ class Post extends Component {
         tags: [],
         items: [],
         currentItem: {
-          name: '',
-          link: ''
+          first: '',
+          second: ''
         },
         images: []
       });
@@ -121,7 +133,6 @@ class Post extends Component {
       alert('게시글 작성 중 오류가 발생했습니다.');
     }
   };
-
 
   render() {
     const { selectedImage, title, content, tags, items, currentItem, images } = this.state;
@@ -137,9 +148,9 @@ class Post extends Component {
           <div className="flex-grow-1 text-center">
           </div>
           <div>
-            <Link to='/mypage'>
+            {/* <Link to='/myPage/'>
               <button className="btn btn-primary mx-1">마이페이지</button>
-            </Link>
+            </Link> */}
           </div>
         </header>
         {/* header */}
@@ -147,6 +158,16 @@ class Post extends Component {
         {/* form container */}
         <div className="container mt-5">
           <div className="d-flex justify-content-center">
+            <div className="items-section border p-5 text-center mx-2" style={{ width: '300px', height: '500px', overflowY: 'auto' }}>
+              <h5>추가된 상품</h5>
+              <ul className="list-group">
+                {items.map((item, index) => (
+                  <li key={index} className="list-group-item">
+                    <a href={item.second} target="_blank" rel="noopener noreferrer">{item.first}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <div className="upload-section border p-5 text-center mx-2" style={{ width: '1000px', height: '500px' }}>
               <form style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <div style={{ flex: 1, textAlign: 'center' }}>
@@ -157,9 +178,8 @@ class Post extends Component {
                     style={{ display: 'block', margin: '0 auto' }}
                   />}
                   {selectedImage && (
-                    <img src={selectedImage} alt="Selected" style={{ maxWidth: '80%', maxHeight: '80%', marginTop: '10px' }} />
+                    <img src={selectedImage} alt="Selected" style={{ maxWidth: '100%', maxHeight: '100%', marginTop: '10px' }} />
                   )}
-
                 </div>
                 <div style={{ flex: 1, marginLeft: '20px' }}>
                   <input
@@ -185,22 +205,24 @@ class Post extends Component {
                   <input
                     type="text"
                     placeholder="상품 이름을 입력하세요"
-                    value={currentItem.name}
+                    value={currentItem.first}
                     onChange={this.onNameChange}
                     style={{ width: '100%', marginTop: '10px' }}
                   />
                   <input
                     type="text"
                     placeholder="상품 링크를 입력하세요"
-                    value={currentItem.link}
+                    value={currentItem.second}
                     onChange={this.onLinkChange}
                     style={{ width: '100%', marginTop: '10px' }}
                   />
-                  <button type="button" onClick={this.addItem} className="btn btn-secondary mt-3">상품 추가</button>
-                  <button type="button" onClick={this.onSubmit} className="btn btn-primary mt-3">게시글 작성</button>
+                  <button type="button" onClick={this.addImage} className="btn btn-secondary mt-3">사진 추가</button>
+                  <button type="button" onClick={this.addItem} className="btn btn-secondary mt-3" style={{ marginLeft: '10px' }}>상품 추가</button>
+                  <button type="button" onClick={this.onSubmit} className="btn btn-primary mt-3" style={{ display: 'block', marginTop: '10px', marginLeft: '160px' }}>게시글 작성</button>
                 </div>
               </form>
             </div>
+
           </div>
           <div className="image-preview">
             {images.map((image, index) => (

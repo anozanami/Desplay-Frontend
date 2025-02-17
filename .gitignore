@@ -18,6 +18,10 @@
 .env.test.local
 .env.production.local
 
+# my files
+.config.js
+config.js
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

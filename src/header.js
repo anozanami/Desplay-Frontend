@@ -110,14 +110,11 @@ class Header extends Component {
         }
         this.setState({ selectedBoardId: boardId, searchResults: response.data.content });
         BoardId = boardId;
-        console.log('검색 결과:', boardId);
-        console.log('selectedBoardId : ', this.state.selectedBoardId);
         console.log('BoardId : ', BoardId);
         // URL을 검색 쿼리와 함께 변경
         sessionStorage.setItem('boardId', boardId);
         const navigate = this.props.navigate;
         navigate(`/?query=${searchQuery}`);
-
       } else {
         console.error('검색 중 오류가 발생했습니다.');
       }
@@ -167,7 +164,6 @@ class Header extends Component {
               ))}
             </ul>
           )}
-          
         </div>
         {/* 검색창 */}
 
@@ -194,7 +190,7 @@ class Header extends Component {
             </div>
           )}
         </div>
-        {/* <div className="search-results">
+        <div className="search-results">
           {this.state.searchResults.map((result, index) => (
             <div key={index} className="search-result-item">
               <Link to={`/board/${result.id}`}>
@@ -203,8 +199,9 @@ class Header extends Component {
               </Link>
             </div>
           ))}
-        </div> */}
-        
+        </div>
+        {selectedBoardId && <BigContent boardId={selectedBoardId} />}
+        {selectedBoardId && <SmallContent boardId={selectedBoardId} />}
       </header>
     );
   }

@@ -1,5 +1,5 @@
 .main-image-container img {
-    max-width: 100%;
+    max-width: 500px;
     height: auto;
   }
   
@@ -9,5 +9,11 @@
   
   .card:hover {
     transform: scale(1.05);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-size-adjust: flex;
   }
   

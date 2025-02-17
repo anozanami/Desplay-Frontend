@@ -71,3 +71,76 @@
 .App-link {
   color: #61dafb;
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.left-section {
+  flex: 1;
+}
+
+.search-section {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.right-section {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .right-section {
+    display: none;
+  }
+}
+
+.search-input {
+  width: 60%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.header-button {
+  margin-left: 10px;
+  padding: 8px 16px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.header-button:hover {
+  background-color: #0056b3;
+}
+
+.big-contents {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  justify-items: center;
+  align-items: center;
+  margin: 0 100px; /* 양쪽으로 100px만큼 떨어지도록 설정 */
+}
+
+.big-contents-item {
+  width: 100%;
+  height: auto;
+}
+
+.big-contents-item img {
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* 이미지를 비율에 맞게 잘라냅니다 */
+}
