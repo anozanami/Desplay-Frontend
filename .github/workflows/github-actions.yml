@@ -64,10 +64,6 @@ jobs:
           echo "${{ secrets.YML_PROD }}" > ./application-prod.yml
         shell: bash
 
-      # gradle build
-      - name: Build with Gradle
-        run: ./gradle build -x test
-
       # docker build & push to production
       - name: Docker build & push to prod
         if: contains(github.ref, 'main')
