@@ -103,7 +103,7 @@ jobs:
         if: contains(github.ref, 'develop')
         with:
           host: ${{ secrets.HOST_DEV }} # EC2 퍼블릭 IPv4 DNS
-          username: ${{ secrets.USERNAME }} # ubuntu
+          username: ${{ secrets.USERNAME }} # ubuntu 
           password: ${{ secrets.PASSWORD }}
           port: 22
           key: ${{ secrets.PRIVATE_KEY }}
