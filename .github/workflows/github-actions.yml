@@ -10,7 +10,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
              
-      # 도커허브 로그인
+      # 내 도커허브 로그인
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
