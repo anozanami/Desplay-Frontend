@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import BigContent from './main/bigContent';
 import SmallContent from './main/smallContent';
+import SortButton from './SortButton';
 import Post from './post/post';
 import MyPage from './myPage/myPage';
 import Login from './main/login';
@@ -40,8 +41,10 @@ class App extends Component {
       this.fetchImages(this.state.boardId);
     }
     console.log('before content: ', content);
+    this.handleSearch();
   }
-
+  
+  
   handleLogin = (userId, accessToken, refreshToken) => {
     this.setState({ loggedIn: true, userId, accessToken, refreshToken });
   };
@@ -52,6 +55,10 @@ class App extends Component {
     sessionStorage.removeItem('userId');
     this.setState({ loggedIn: false, userId: null, accessToken: null });
   };
+
+  handleSort =() => {
+    
+  }
 
   handleInputChange = async (event) => {
     const searchQuery = event.target.value;
@@ -106,8 +113,8 @@ class App extends Component {
     sessionStorage.setItem('searchQuery', searchQuery);
 
     if (searchQuery === '') {
-      alert('검색어를 입력해주세요.');
-      return;
+      // alert('검색어를 입력해주세요.');
+      // return;
     }
     try {
       const response = await axios.get(serverIpAddress + '/api/board/search', {
@@ -137,7 +144,9 @@ class App extends Component {
 
         // URL을 검색 쿼리와 함께 변경
         sessionStorage.setItem('selectedBoardId', JSON.stringify(boardId));
-        this.props.navigate(`/?query=${searchQuery}`);
+        if(searchQuery !== '') {
+          this.props.navigate(`/?query=${searchQuery}`);
+        }
       } else {
         console.error('검색 중 오류가 발생했습니다.');
       }
@@ -217,6 +226,7 @@ class App extends Component {
               className="btn btn-primary mx-1"
               onClick={this.handleSearch}
             >검색</button>
+            <SortButton/>
 
             {autoCompleteSuggestions.length > 0 && (
               <ul className="list-group">

@@ -54,7 +54,7 @@ class myPage extends Component {
 
     fetchImages = async (imageIds) => {
         try {
-            const token = localStorage.getItem('accessToken');
+            const token = sessionStorage.getItem('accessToken');
             const photoPromises = imageIds.map(async (imageId) => {
                 const response = await axios({
                     method: 'GET',

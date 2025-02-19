@@ -48,9 +48,9 @@ class Login extends Component {
       if (response.status === 200) {
         sessionStorage.setItem('loggedIn', 'true');
         sessionStorage.setItem('userId', username);
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-        localStorage.setItem('username', username);
+        sessionStorage.setItem('accessToken', response.data.accessToken);
+        sessionStorage.setItem('refreshToken', response.data.refreshToken);
+        sessionStorage.setItem('username', username);
         this.setState({ loggedIn: true, error: '' });
         this.props.onLogin(username, response.data.accessToken, response.data.refreshToken);
       } else {

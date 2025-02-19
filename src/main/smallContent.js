@@ -18,7 +18,7 @@ class SmallContent extends Component {
   
   fetchImages2 = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = sessionStorage.getItem('accessToken');
       const response = await axios({
         method: 'GET',
         url: `${config.api}/api/image/show`,

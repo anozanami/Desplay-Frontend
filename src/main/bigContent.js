@@ -16,7 +16,7 @@ const BigContent = ({ boardId, content, searchQuery }) => {
 
   const fetchImages = async (boardIds) => {
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = sessionStorage.getItem('accessToken');
       const photoPromises = boardIds.map(async (boardId) => {
         const response = await axios({
           method: 'GET',

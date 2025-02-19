@@ -16,12 +16,39 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
-      # 도커 빌드 관련 셋업
-      - name: Set up Docker Buildx
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest . 
 
-      # 도커이미지 빌드하고 허브로푸쉬
-      - name: Build and push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest
+      - name: Build and push Docker image
+        run : |
+          docker ps -aq | grep -v $(docker ps -aqf "name=nginx-container") | xargs -r sudo docker rm -f
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest
+
+      - name: SSH and deploy on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOME_SERVER_IP }}
+          username: ${{ secrets.HOME_SERVER_USERNAME }}
+          password: ${{ secrets.HOME_SERVER_PASSWORD }}
+          port: ${{ secrets.HOME_SERVER_PORT }}
+          # script_stop: true
+          script: |
+            # React 애플리케이션 배포
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest
+            sudo docker stop desplay-frontend || true
+            sudo docker rm desplay-frontend || true
+            sudo docker run -d -p 3000:3000 --name desplay ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest
+
+            # Spring Boot 애플리케이션 배포
+            docker pull ${{ secrets.DOCKERHUB_USERNAME_BACKEND }}/desplay:latest
+            docker stop desplay || true
+            docker rm desplay || true
+            docker run -d -p 3000:3000 --name desplay ${{ secrets.DOCKERHUB_USERNAME_BACKEND }}/desplay:latest
+
+      # # 도커 빌드 관련 셋업
+      # - name: Set up Docker Buildx
+      #   run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest . 
+
+      # # 도커이미지 빌드하고 허브로푸쉬
+      # - name: Build and push
+      #   run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest
         
