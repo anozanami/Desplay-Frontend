@@ -38,12 +38,6 @@ jobs:
             sudo docker rm desplay-frontend || true
             sudo docker run -d -p 3000:3000 --name desplay ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest
 
-            # Spring Boot 애플리케이션 배포
-            docker pull ${{ secrets.DOCKERHUB_USERNAME_BACKEND }}/desplay:latest
-            docker stop desplay || true
-            docker rm desplay || true
-            docker run -d -p 3000:3000 --name desplay ${{ secrets.DOCKERHUB_USERNAME_BACKEND }}/desplay:latest
-
       # # 도커 빌드 관련 셋업
       # - name: Set up Docker Buildx
       #   run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/desplay-frontend:latest . 
