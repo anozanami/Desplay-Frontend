@@ -6,8 +6,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { config } from '../config';
 
-const token = sessionStorage.getItem('accessToken');
-const username = sessionStorage.getItem('username');
+const token = localStorage.getItem('accessToken');
+const username = localStorage.getItem('username');
 
 const Information = () => {
   const location = useLocation();

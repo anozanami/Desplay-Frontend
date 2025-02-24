@@ -6,7 +6,7 @@ import { config } from '../config.js';
 
 class myPage extends Component {
     state = {
-        userId: sessionStorage.getItem("userId"),
+        userId: localStorage.getItem("userId"),
         images: [],
         boardId: [],
         content: [],
@@ -54,7 +54,7 @@ class myPage extends Component {
 
     fetchImages = async (imageIds) => {
         try {
-            const token = sessionStorage.getItem('accessToken');
+            const token = localStorage.getItem('accessToken');
             const photoPromises = imageIds.map(async (imageId) => {
                 const response = await axios({
                     method: 'GET',
@@ -82,7 +82,7 @@ class myPage extends Component {
 
             const images = await Promise.all(photoPromises);
             this.setState({ images: images.filter(photo => photo !== null) });
-            sessionStorage.setItem('images', JSON.stringify(images.filter(photo => photo !== null)));
+            localStorage.setItem('images', JSON.stringify(images.filter(photo => photo !== null)));
         } catch (error) {
             console.error('이미지를 불러오는 중 오류가 발생했습니다.', error);
         }

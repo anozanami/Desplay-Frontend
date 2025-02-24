@@ -70,7 +70,7 @@ class Post extends Component {
   addItem = (event) => {
     this.setState((prevState) => ({
       items: [...prevState.items, { first: prevState.currentItem.first, second: prevState.currentItem.second }],
-      currentItem: { first: ' ', second: ' ' },
+      currentItem: { first: '', second: '' },
     }));
   };
 
@@ -110,7 +110,7 @@ class Post extends Component {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
 

@@ -5,8 +5,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { config } from '../config.js';
 
 const BigContent = ({ boardId, content, searchQuery }) => {
-  const [photos, setPhotos] = useState(JSON.parse(sessionStorage.getItem('photos')) || []);
-  const selectedBoardId = JSON.parse(sessionStorage.getItem('selectedBoardId')) || [];
+  const [photos, setPhotos] = useState(JSON.parse(localStorage.getItem('photos')) || []);
+  const selectedBoardId = JSON.parse(localStorage.getItem('selectedBoardId')) || [];
   useEffect(() => {
     if (photos.length === 0) {
       fetchImages(boardId);
@@ -16,7 +16,7 @@ const BigContent = ({ boardId, content, searchQuery }) => {
 
   const fetchImages = async (boardIds) => {
     try {
-      const token = sessionStorage.getItem('accessToken');
+      const token = localStorage.getItem('accessToken');
       const photoPromises = boardIds.map(async (boardId) => {
         const response = await axios({
           method: 'GET',
@@ -44,7 +44,7 @@ const BigContent = ({ boardId, content, searchQuery }) => {
 
       const photos = await Promise.all(photoPromises);
       setPhotos(photos.filter(photo => photo !== null));
-      sessionStorage.setItem('photos', JSON.stringify(photos.filter(photo => photo !== null)));
+      localStorage.setItem('photos', JSON.stringify(photos.filter(photo => photo !== null)));
       console.log('photos in bigContent: ' + photos);
     } catch (error) {
       console.error('이미지를 불러오는 중 오류가 발생했습니다.', error);

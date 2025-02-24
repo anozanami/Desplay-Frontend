@@ -13,7 +13,6 @@ import Register from './main/register';
 import Information from './info/information';
 import { config } from './config';
 
-const serverIpAddress = "http://221.139.98.118";
 let BoardId = null;
 let content = null;
 class App extends Component {
@@ -21,22 +20,22 @@ class App extends Component {
     super(props);
     this.state = {
       loggedIn: false,
-      userId: sessionStorage.getItem('userId'),
+      userId: localStorage.getItem('userId'),
       searchQuery: '',
       searchResults: [],
       autoCompleteSuggestions: [],
-      accessToken: sessionStorage.getItem('accessToken'),
-      selectedBoardId: JSON.parse(sessionStorage.getItem('selectedBoardId')) || null,
+      accessToken: localStorage.getItem('accessToken'),
+      selectedBoardId: JSON.parse(localStorage.getItem('selectedBoardId')) || null,
       boardId: null,
-      photos: JSON.parse(sessionStorage.getItem('photos')) || [],
+      photos: JSON.parse(localStorage.getItem('photos')) || [],
     };
   }
 
   componentDidMount() {
-    if (sessionStorage.getItem('searchQuery') === '' || window.location.pathname === '/') {
-      // sessionStorage.removeItem('photos');
-      // sessionStorage.removeItem('selectedBoardId');
-      // sessionStorage.removeItem('searchQuery');
+    if (localStorage.getItem('searchQuery') === '' || window.location.pathname === '/') {
+      // localStorage.removeItem('photos');
+      // localStorage.removeItem('selectedBoardId');
+      // localStorage.removeItem('searchQuery');
     } else {
       this.fetchImages(this.state.boardId);
     }
@@ -50,15 +49,11 @@ class App extends Component {
   };
 
   handleLogout = () => {
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('loggedIn');
-    sessionStorage.removeItem('userId');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('userId');
     this.setState({ loggedIn: false, userId: null, accessToken: null });
   };
-
-  handleSort =() => {
-    
-  }
 
   handleInputChange = async (event) => {
     const searchQuery = event.target.value;
@@ -69,7 +64,7 @@ class App extends Component {
         const token = localStorage.getItem('accessToken');
         const response = await axios({
           method: 'GET',
-          url: `${serverIpAddress}/api/auto-complete/get-string/${searchQuery}`,
+          url: `${config.api}/api/auto-complete/get-string/${searchQuery}`,
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -83,6 +78,7 @@ class App extends Component {
         }
       } catch (error) {
         console.error('자동완성 오류2', error);
+        console.log(this.state.searchQuery);
       }
     } else {
       this.setState({ autoCompleteSuggestions: [] });
@@ -94,7 +90,7 @@ class App extends Component {
     this.setState({ searchQuery: suggestion, autoCompleteSuggestions: [] });
 
     try {
-      await axios.post(serverIpAddress + '/api/auto-complete/update-string', {
+      await axios.post(config.api + '/api/auto-complete/update-string', {
         json: {
           input: suggestion
         },
@@ -110,21 +106,21 @@ class App extends Component {
   handleSearch = async () => {
     const token = localStorage.getItem('accessToken');
     const { searchQuery } = this.state;
-    sessionStorage.setItem('searchQuery', searchQuery);
+    localStorage.setItem('searchQuery', searchQuery);
 
     if (searchQuery === '') {
       // alert('검색어를 입력해주세요.');
       // return;
     }
     try {
-      const response = await axios.get(serverIpAddress + '/api/board/search', {
+      const response = await axios.get(config.api + '/api/board/search', {
         params: {
           page: 0,
           size: 100,
           keyword: searchQuery, // 고정
           // tags: 'NEAT&FANCY',
           // username: this.state.userId, 마이페이지에서만 필요
-          // sortType: 'DATE_DESC&LIKE_ASC', 
+          sortType: 'LIKE_DESC', 
           searchType: 'MAIN' // 고정
         },
         headers: {
@@ -143,7 +139,7 @@ class App extends Component {
         console.log('content in app:', content);
 
         // URL을 검색 쿼리와 함께 변경
-        sessionStorage.setItem('selectedBoardId', JSON.stringify(boardId));
+        localStorage.setItem('selectedBoardId', JSON.stringify(boardId));
         if(searchQuery !== '') {
           this.props.navigate(`/?query=${searchQuery}`);
         }
@@ -186,7 +182,7 @@ class App extends Component {
 
         const photos = await Promise.all(photoPromises);
         this.setState({ photos: photos.filter(photo => photo !== null) });
-        sessionStorage.setItem('photos', JSON.stringify(photos.filter(photo => photo !== null)));
+        localStorage.setItem('photos', JSON.stringify(photos.filter(photo => photo !== null)));
       } catch (error) {
         console.error('이미지를 불러오는 중 오류가 발생했습니다.', error);
       }
@@ -195,14 +191,14 @@ class App extends Component {
 
   handleHomeClick = () => {
     window.location.href = '/';
-    sessionStorage.removeItem('searchQuery');
-    sessionStorage.removeItem('selectedBoardId');
-    sessionStorage.removeItem('photos');
+    localStorage.removeItem('searchQuery');
+    localStorage.removeItem('selectedBoardId');
+    localStorage.removeItem('photos');
   };
 
   render() {
-    const loggedIn = sessionStorage.getItem('loggedIn') === 'true';
-    const userId = sessionStorage.getItem('userId');
+    const loggedIn = localStorage.getItem('loggedIn') === 'true';
+    const userId = localStorage.getItem('userId');
     const { searchQuery, autoCompleteSuggestions, selectedBoardId, response, photos, searchResults } = this.state;
     // console.log('response : ', response);
     // console.log('searchResults : ', searchResults);

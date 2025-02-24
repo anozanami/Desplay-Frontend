@@ -49,8 +49,8 @@ class Register extends Component {
       if (response.status === 200) {
         this.setState({ registered: true, error: '' });
         this.setState({ accessToken: response.data.accessToken, refreshToken: response.data.refreshToken });
-        sessionStorage.setItem('accessToken', response.data.accessToken);
-        sessionStorage.setItem('refreshToken', response.data.refreshToken);
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
       } else {
         this.setState({ error: response.data.message });
       }

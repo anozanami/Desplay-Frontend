@@ -29,7 +29,7 @@ class Router extends Component {
 
   render() {
     const { loggedIn } = this.state;
-    const userId = sessionStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
 
     return (
       <BrowserRouter>

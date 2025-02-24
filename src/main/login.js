@@ -46,11 +46,11 @@ class Login extends Component {
       });
 
       if (response.status === 200) {
-        sessionStorage.setItem('loggedIn', 'true');
-        sessionStorage.setItem('userId', username);
-        sessionStorage.setItem('accessToken', response.data.accessToken);
-        sessionStorage.setItem('refreshToken', response.data.refreshToken);
-        sessionStorage.setItem('username', username);
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('userId', username);
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+        localStorage.setItem('username', username);
         this.setState({ loggedIn: true, error: '' });
         this.props.onLogin(username, response.data.accessToken, response.data.refreshToken);
       } else {
@@ -67,7 +67,7 @@ class Login extends Component {
   };
 
   render() {
-    if (this.state.loggedIn || sessionStorage.getItem('loggedIn') === 'true') {
+    if (this.state.loggedIn || localStorage.getItem('loggedIn') === 'true') {
       return (
         // <Transition in={this.state.registered} timeout={animationTiming} mountOnEnter unmountOnExit>
         //   {state => (
